@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8">
+<h3>My Assistant</h3>
+<textarea id="prompt" rows="4" style="width:100%" placeholder="Ask for code, text, SQL..."></textarea>
+<button id="go">Send</button>
+<pre id="out" style="white-space:pre-wrap;max-height:60vh;overflow:auto"></pre>
+<script>
+const out = document.getElementById('out');
+document.getElementById('go').onclick = async () => {
+  out.textContent = "";
+  const resp = await fetch("/api/generate", {
+    method:"POST", body: JSON.stringify({ prompt: document.getElementById('prompt').value })
+  });
+  const reader = resp.body.getReader(), dec = new TextDecoder();
+  while (true) { const {value, done} = await reader.read(); if (done) break;
+    out.textContent += dec.decode(value, {stream:true});
+    out.scrollTop = out.scrollHeight;
+  }
+};
+</script>
